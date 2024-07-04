@@ -3,13 +3,6 @@
 
 using namespace std;
 
-int totalHP(Slime *team) {
-    int total = 0;
-    for (int i = 0; i < 3; i++) {
-        total += team[i].getHP();
-    }
-    return total;
-}
 
 int slimeAlive(Slime *team) {
     int aliveCount = 0;
@@ -205,7 +198,7 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
             }
         }
 
-        if (totalHP(playerTeam) == 0 || totalHP(enemyTeam) == 0 || roundCount > 100) {
+        if (slimeAlive(playerTeam) == 0 || slimeAlive(enemyTeam) == 0 || roundCount > 100) {
             gameOver = true;
         }
         // 回合结束
@@ -216,7 +209,7 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
 // 战斗结束
     if (roundCount > 100) {
         cout << "Draw" << endl;
-    } else if (totalHP(playerTeam) > 0) {
+    } else if (slimeAlive(playerTeam) > 0) {
         cout << "You Win" << endl;
     } else {
         cout << "You Lose" << endl;
