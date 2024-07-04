@@ -1,6 +1,5 @@
 #include <iostream>
 #include "engine.h"
-#include "unit.h"
 
 using namespace std;
 
@@ -41,15 +40,9 @@ void getSlimeRemain(int &S1, int &S2, int curr) {
 }
 
 
-void printHP(Slime *p_playerSlime, Slime *p_enemySlime) {
-    cout << "Your " << p_playerSlime->getName()
-        << ": HP " << p_playerSlime->getHP() <<" || Enemy's "
-        << p_enemySlime->getName() << ": HP "
-        << p_enemySlime->getHP() << endl;
-}
 
 int playerPassiveChange(Slime *team, int curr) {
-    cout << "Your " << team[curr - 1].getName() << " is beaten" << endl;
+    printPlayerBeaten(&team[curr - 1]);
     int choice = 0, alive = 0;
     switch (slimeAlive(team))
     {
@@ -60,22 +53,15 @@ int playerPassiveChange(Slime *team, int curr) {
                 break;
             }
         }
-        while (choice != alive) {
-            cout << "Select your next slime (" << alive << " for " << team[alive - 1].getName() << "): ";
-            cin >> choice;
-        }
-        cout << "You send " << team[choice - 1].getName() << endl;
+        choice = selectSlimeFrom1(team, alive);
+        printPlayerSend(&team[choice - 1]);
         return choice;
         break;
     case 2:
         int Slime1, Slime2;
         getSlimeRemain(Slime1, Slime2, curr);
-        while (choice != Slime1 && choice != Slime2) {
-            cout << "Select your next slime (" << Slime1 << " for " << team[Slime1 - 1].getName() << ", "
-                << Slime2 << " for " << team[Slime2 - 1].getName() << "): ";
-            cin >> choice;
-        }
-        cout << "You send " << team[choice - 1].getName() << endl;
+        choice = selectSlimeFrom2(team, Slime1, Slime2);
+        printPlayerSend(&team[choice - 1]);
         return choice;
         break;
     default:
@@ -85,7 +71,7 @@ int playerPassiveChange(Slime *team, int curr) {
 }
 
 int enemyPassiveChange(Slime *team, int curr, Slime *rival) {
-    cout << "Enemy's " << team[curr - 1].getName() << " is beaten" << endl;
+    printEnemyBeaten(&team[curr - 1]);
     int choice = 0, alive = 0;
     switch (slimeAlive(team))
     {
@@ -96,7 +82,7 @@ int enemyPassiveChange(Slime *team, int curr, Slime *rival) {
                 break;
             }
         }
-        cout << "Enemy sends " << team[alive - 1].getName() << endl;
+        printEmenySend(&team[alive - 1]);
         return alive;
     case 2:
         int Slime1, Slime2;
@@ -110,7 +96,7 @@ int enemyPassiveChange(Slime *team, int curr, Slime *rival) {
         } else {
             choice = Slime2;
         }
-        cout << "Enemy sends " << team[choice - 1].getName() << endl;
+        printEmenySend(&team[choice - 1]);
         return choice;
     default:
         return -1;
@@ -120,86 +106,58 @@ int enemyPassiveChange(Slime *team, int curr, Slime *rival) {
 void play(Slime *playerTeam, Slime *enemyTeam) {
 // 战斗开始前
     // 初始信息
-    cout << "Welcome to Battle of Slimes!" << endl;
-    cout << "You have Green, Red and Blue. So does Enemy." << endl;
+    printWelcome();
     
     // 玩家选择Slime
-    int playerSlimeChoice = 0;
-    while (playerSlimeChoice < 1 || playerSlimeChoice > 3) {
-        cout << "Select your starting slime (1 for Green, 2 for Red, 3 for Blue): ";
-        cin >> playerSlimeChoice;
-    }
+    int playerSlimeChoice = firstSlimeChoice();
     Slime *p_playerSlime = &playerTeam[playerSlimeChoice - 1];
-    cout << "You start with " << p_playerSlime->getName() << endl;
 
     // 敌人选择Slime(选择属性克制的)
     int enemySlimeChoice = playerSlimeChoice % 3 + 1;
     Slime *p_enemySlime = &enemyTeam[enemySlimeChoice - 1];
-    cout << "Enemy starts with " << p_enemySlime->getName() << endl;
 
 // 战斗过程中
-    cout << "Battle starts!" << endl;
+    pringStart(p_playerSlime, p_enemySlime);
     int roundCount = 1;
     bool gameOver = false;
     while (!gameOver) {
         // 回合开始
         printHP(p_playerSlime, p_enemySlime);
-        cout << "--------------------------------------------------" << endl;
-        cout << "Round " << roundCount << endl;
-
+        printRound(roundCount);
         // 选择行动
         // 玩家选择行动
-        int playerActionChoice = 0;
+        int playerActionChoice = -1;
     
         if (slimeAlive(playerTeam) == 1) {
-            while (playerActionChoice != 1) {
-                cout << "Select your action (1 for skill): ";
-                cin >> playerActionChoice;
-            }
+            playerActionChoice = selectActionFrom1();
         } else {
-            while (playerActionChoice != 1 && playerActionChoice != 2) {
-                cout << "Select your action (1 for skill, 2 for change): ";
-                cin >> playerActionChoice;
-            }
+            playerActionChoice = selectActionFrom2();
         }
 
         int playerChangeChoice = playerSlimeChoice, enemyChangeChoice = enemySlimeChoice;
         // 选择技能
         SkillEnum playerSkill = TACKLE;
         if (playerActionChoice == 1) {
-            int playerSkillChoice = 0;
-            while (playerSkillChoice != 1 && playerSkillChoice != 2) {
-                cout << "Select the skill (1 for " << getSkillName(p_playerSlime->getSkill(1))
-                    << ", 2 for " << getSkillName(p_playerSlime->getSkill(2)) << "): ";
-                cin >> playerSkillChoice;
-            }
+            int playerSkillChoice = selectSkill(p_playerSlime);
             playerSkill = p_playerSlime->getSkill(playerSkillChoice);
         
         // 选择交换
         } else {
             // 只有一个能交换
             if (slimeAlive(playerTeam) == 2){
-                int temp;
+                int tempAlive;
                 for (int i = 0; i < 3; i++) {
                     if (i + 1 != playerSlimeChoice && playerTeam[i].getHP() != 0) {
-                        temp = i + 1;
+                        tempAlive = i + 1;
                         break;
                     }
                 }
-                while (playerChangeChoice != temp) {
-                    cout << "Select your next slime (" << temp << " for " << playerTeam[temp - 1].getName() << "): ";
-                    cin >> playerChangeChoice;
-                }
+                playerChangeChoice = selectSlimeFrom1(playerTeam, tempAlive);
             // 两个能交换
             } else {
                 int Slime1, Slime2;
                 getSlimeRemain(Slime1, Slime2, playerSlimeChoice);
-                while (playerChangeChoice != Slime1 && playerChangeChoice != Slime2) {
-                    cout << "Select your next slime ("
-                        << Slime1 << " for " << playerTeam[Slime1 - 1].getName() << ", "
-                        << Slime2 << " for " << playerTeam[Slime2 - 1].getName() << "): ";
-                    cin >> playerChangeChoice;
-                }
+               playerChangeChoice = selectSlimeFrom2(playerTeam, Slime1, Slime2);
             } 
         }
         // 简单敌人（1）选择行动
@@ -215,7 +173,7 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
         if (playerActionChoice == 2) {
             playerSlimeChoice = playerChangeChoice;
             p_playerSlime = &playerTeam[playerSlimeChoice - 1];
-            cout << "You send " << p_playerSlime->getName() << endl;
+            printPlayerSend(p_playerSlime);
             p_enemySlime->attack(enemySkill, p_playerSlime);
             if (p_playerSlime->getHP() <= 0) {
                 playerChangeChoice = playerPassiveChange(playerTeam, playerSlimeChoice);

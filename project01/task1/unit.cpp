@@ -1,5 +1,5 @@
 #include "unit.h"
-#include <iostream>
+#include "iomsg.h"
 
 double typeBonus(TypeEnum type1, TypeEnum type2);
 std::string Slime::getName() const {return name;}
@@ -47,13 +47,7 @@ void Slime::attack(SkillEnum skill, Slime *rival) {
         damage = 20 * ATK / rival->getDEF() * typeBonus(type, rival->getType());
     }
     rival->setHP(max(rival->getHP() - damage, 0));
-    
-    if (isEnemy()) {
-        std::cout << "Enemy's ";
-    } else {
-        std::cout << "Your ";
-    }
-    std::cout << getName() << " uses " << getSkillName(skill) << "! Damage: " << damage << std::endl;
+    printAttack(this, getSkillName(skill), damage);
 }
 
 std::string getSkillName(SkillEnum skill) {
@@ -79,7 +73,6 @@ bool isTypeAdvantage(TypeEnum selfType, TypeEnum rivalType) {
 }
 
 
-// Green attack Red 0.5
 double typeBonus(TypeEnum attackType, TypeEnum slimeType){
     if (isTypeAdvantage(attackType, slimeType)) {
         return 2.0;
