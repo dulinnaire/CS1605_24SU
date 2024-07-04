@@ -19,6 +19,16 @@ int slimeAlive(Slime *team) {
     return aliveCount;
 }
 
+int findAlive(Slime *team, int curr) {
+    for (int i = 0; i < 3; i++) {
+        if (i == curr - 1) {continue;}
+        if (team[i].getHP() > 0) {
+            return i + 1;
+        }
+    }
+    return -1;
+}
+
 void getSlimeRemain(int &S1, int &S2, int curr) {
     switch (curr)
     {
@@ -41,66 +51,70 @@ void getSlimeRemain(int &S1, int &S2, int curr) {
 
 
 
-int playerPassiveChange(Slime *team, int curr) {
-    printPlayerBeaten(&team[curr - 1]);
+void playerPassiveChange(Slime *playerTeam, int& playerSlimeChoice, Slime **pp_self) {
+    // 没有被击倒
+    if (playerTeam[playerSlimeChoice - 1].getHP() > 0) {
+        return;
+    }
+    // 被击倒
+    printPlayerBeaten(&playerTeam[playerSlimeChoice - 1]);
     int choice = 0, alive = 0;
-    switch (slimeAlive(team))
+    switch (slimeAlive(playerTeam))
     {
     case 1:
-        for (int i = 0; i < 3; i++) {
-            if (team[i].getHP() > 0) {
-                alive = i + 1;
-                break;
-            }
-        }
-        choice = selectSlimeFrom1(team, alive);
-        printPlayerSend(&team[choice - 1]);
-        return choice;
+        alive = findAlive(playerTeam, playerSlimeChoice);
+        choice = selectSlimeFrom1(playerTeam, alive);
+        printSend(&playerTeam[choice - 1]);
+        playerSlimeChoice = choice;
         break;
     case 2:
         int Slime1, Slime2;
-        getSlimeRemain(Slime1, Slime2, curr);
-        choice = selectSlimeFrom2(team, Slime1, Slime2);
-        printPlayerSend(&team[choice - 1]);
-        return choice;
+        getSlimeRemain(Slime1, Slime2, playerSlimeChoice);
+        choice = selectSlimeFrom2(playerTeam, Slime1, Slime2);
+        printSend(&playerTeam[choice - 1]);
+        playerSlimeChoice = choice;
         break;
     default:
-        return -1;
+        return;
         break;
     }
+    *pp_self = &playerTeam[playerSlimeChoice - 1];
 }
 
-int enemyPassiveChange(Slime *team, int curr, Slime *rival) {
-    printEnemyBeaten(&team[curr - 1]);
+void enemyPassiveChange(Slime *enemyTeam, int &enemySlimeChoice, Slime *p_rival, Slime **pp_self) {
+    // 没有被击倒
+    if (enemyTeam[enemySlimeChoice - 1].getHP() > 0) {
+        return;
+    }
+    // 被击倒
+    printEnemyBeaten(&enemyTeam[enemySlimeChoice - 1]);
     int choice = 0, alive = 0;
-    switch (slimeAlive(team))
+    switch (slimeAlive(enemyTeam))
     {
     case 1:
-        for (int i = 0; i < 3; i++) {
-            if (team[i].getHP() > 0) {
-                alive = i + 1;
-                break;
-            }
-        }
-        printEmenySend(&team[alive - 1]);
-        return alive;
+        alive = findAlive(enemyTeam, enemySlimeChoice);
+        printSend(&enemyTeam[alive - 1]);
+        enemySlimeChoice = alive;
+        break;
     case 2:
         int Slime1, Slime2;
-        getSlimeRemain(Slime1, Slime2, curr);
-        if (isTypeAdvantage(team[Slime1 - 1].getType(), rival->getType())) {
+        getSlimeRemain(Slime1, Slime2, enemySlimeChoice);
+        if (isTypeAdvantage(enemyTeam[Slime1 - 1].getType(), p_rival->getType())) {
             choice = Slime1;
-        } else if (isTypeAdvantage(team[Slime2 - 1].getType(), rival->getType())) {
+        } else if (isTypeAdvantage(enemyTeam[Slime2 - 1].getType(), p_rival->getType())) {
             choice = Slime2;
-        } else if (team[Slime1].getType() == rival->getType()) {
+        } else if (enemyTeam[Slime1].getType() == p_rival->getType()) {
             choice = Slime1;
         } else {
             choice = Slime2;
         }
-        printEmenySend(&team[choice - 1]);
-        return choice;
+        printSend(&enemyTeam[choice - 1]);
+        enemySlimeChoice = choice;
+        break;
     default:
-        return -1;
+        return;
     }
+    *pp_self = &enemyTeam[enemySlimeChoice - 1];
 }
 
 void play(Slime *playerTeam, Slime *enemyTeam) {
@@ -134,7 +148,7 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
             playerActionChoice = selectActionFrom2();
         }
 
-        int playerChangeChoice = playerSlimeChoice, enemyChangeChoice = enemySlimeChoice;
+        int playerChangeChoice = playerSlimeChoice;
         // 选择技能
         SkillEnum playerSkill = TACKLE;
         if (playerActionChoice == 1) {
@@ -145,19 +159,13 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
         } else {
             // 只有一个能交换
             if (slimeAlive(playerTeam) == 2){
-                int tempAlive;
-                for (int i = 0; i < 3; i++) {
-                    if (i + 1 != playerSlimeChoice && playerTeam[i].getHP() != 0) {
-                        tempAlive = i + 1;
-                        break;
-                    }
-                }
+                int tempAlive = findAlive(playerTeam, playerSlimeChoice);
                 playerChangeChoice = selectSlimeFrom1(playerTeam, tempAlive);
             // 两个能交换
             } else {
                 int Slime1, Slime2;
                 getSlimeRemain(Slime1, Slime2, playerSlimeChoice);
-               playerChangeChoice = selectSlimeFrom2(playerTeam, Slime1, Slime2);
+                playerChangeChoice = selectSlimeFrom2(playerTeam, Slime1, Slime2);
             } 
         }
         // 简单敌人（1）选择行动
@@ -173,55 +181,26 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
         if (playerActionChoice == 2) {
             playerSlimeChoice = playerChangeChoice;
             p_playerSlime = &playerTeam[playerSlimeChoice - 1];
-            printPlayerSend(p_playerSlime);
+            printSend(p_playerSlime);
             p_enemySlime->attack(enemySkill, p_playerSlime);
-            if (p_playerSlime->getHP() <= 0) {
-                playerChangeChoice = playerPassiveChange(playerTeam, playerSlimeChoice);
-
-                if (playerChangeChoice == -1) break;
-
-                playerSlimeChoice = playerChangeChoice;
-                p_playerSlime = &playerTeam[playerSlimeChoice - 1];
-            }
+            playerPassiveChange(playerTeam, playerSlimeChoice, &p_playerSlime);
         // 玩家选择攻击
         } else {
             if (p_playerSlime->getSPD() > p_enemySlime->getSPD()){
                 p_playerSlime->attack(playerSkill, p_enemySlime);
                 if (p_enemySlime->getHP() <= 0) {
-                    enemyChangeChoice = enemyPassiveChange(enemyTeam, enemySlimeChoice, p_playerSlime);
-                    if (enemyChangeChoice == -1) break;
-                    enemySlimeChoice = enemyChangeChoice;
-                    p_enemySlime = &enemyTeam[enemySlimeChoice - 1];
-                        
+                    enemyPassiveChange(enemyTeam, enemySlimeChoice, p_playerSlime, &p_enemySlime);
                 } else {
                     p_enemySlime->attack(enemySkill, p_playerSlime);
-                    if (p_playerSlime->getHP() <= 0) {
-                        playerChangeChoice = playerPassiveChange(playerTeam, playerSlimeChoice);
-
-                        if (playerChangeChoice == -1) break;
-
-                        playerSlimeChoice = playerChangeChoice;
-                        p_playerSlime = &playerTeam[playerSlimeChoice - 1];
-                    }
+                    playerPassiveChange(playerTeam, playerSlimeChoice, &p_playerSlime);
                 }
             } else {
                 p_enemySlime->attack(enemySkill, p_playerSlime);
                 if (p_playerSlime->getHP() <= 0) {
-                    playerChangeChoice = playerPassiveChange(playerTeam, playerSlimeChoice);
-
-                    if (playerChangeChoice == -1) break;
-
-                    playerSlimeChoice = playerChangeChoice;
-                    p_playerSlime = &playerTeam[playerSlimeChoice - 1];
-                        
+                    playerPassiveChange(playerTeam, playerSlimeChoice, &p_playerSlime);    
                 } else {
                     p_playerSlime->attack(playerSkill, p_enemySlime);
-                    if (p_enemySlime->getHP() <= 0) {
-                        enemyChangeChoice = enemyPassiveChange(enemyTeam, enemySlimeChoice, p_playerSlime);
-                        if (enemyChangeChoice == -1) break;
-                        enemySlimeChoice = enemyChangeChoice;
-                        p_enemySlime = &enemyTeam[enemySlimeChoice - 1];
-                    }
+                    enemyPassiveChange(enemyTeam, enemySlimeChoice, p_playerSlime, &p_enemySlime);
                 }
             }
         }

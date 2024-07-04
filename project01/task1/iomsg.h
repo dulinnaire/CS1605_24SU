@@ -16,9 +16,7 @@ void printEnemyBeaten(Slime *p_slime);
 
 void printRound(int n);
 
-void printPlayerSend(Slime *p_slime);
-
-void printEmenySend(Slime *p_slime);
+void printSend(Slime *p_slime);
 
 void printAttack(Slime *p_slime, std::string skillName, int damage);
 

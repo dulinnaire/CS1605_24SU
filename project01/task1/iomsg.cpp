@@ -26,13 +26,14 @@ void printHP(Slime *p_playerSlime, Slime *p_enemySlime) {
         << p_enemySlime->getHP() << endl;
 }
 
-void printPlayerSend(Slime *p_slime) {
-    cout << "You send " << p_slime->getName() << endl;
+void printSend(Slime *p_slime) {
+    if (p_slime->isEnemy()){
+        cout << "Enemy sends " << p_slime->getName() << endl;
+    } else {
+        cout << "You send " << p_slime->getName() << endl;
+    }
 }
 
-void printEmenySend(Slime *p_slime) {
-    cout << "Enemy sends " << p_slime->getName() << endl;
-}
 
 void printPlayerBeaten(Slime *p_slime) {
     cout << "Your " << p_slime->getName() << " is beaten" << endl;
