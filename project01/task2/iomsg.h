@@ -4,6 +4,8 @@
 #include <string>
 #include "unit.h"
 
+using namespace std;
+
 void printWelcome();
 
 void pringStart(Slime *p_playerSlime, Slime *p_enemySlime);
@@ -18,15 +20,19 @@ void printRound(int n);
 
 void printSend(Slime *p_slime);
 
-void printAttack(Slime *p_slime, std::string skillName, int damage);
+void printAttack(Slime *p_slime, string skillName, int damage);
+
+void printAtkPotion(Slime *p_slime);
+
+void printRevivalPotion(Slime *p_slime);
 
 void printEndGame();
 
-int inputHelper(std::string prompt, int choice1);
+int inputHelper(string prompt, int choice1);
 
-int inputHelper(std::string prompt, int choice1, int choice2);
+int inputHelper(string prompt, int choice1, int choice2);
 
-int inputHelper(std::string prompt, int choice1, int choice2, int choice3);
+int inputHelper(string prompt, int choice1, int choice2, int choice3);
 
 int firstSlimeChoice();
 

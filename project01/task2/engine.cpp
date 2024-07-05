@@ -198,10 +198,10 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
 
         int playerChangeChoice = playerSlimeChoice;
         // 选择技能
-        SkillEnum playerSkill = TACKLE;
+        Skill *p_playerSkill = nullptr;
         if (playerActionChoice == 1) {
             int playerSkillChoice = selectSkill(p_playerSlime);
-            playerSkill = p_playerSlime->getSkill(playerSkillChoice);
+            p_playerSkill = p_playerSlime->getSkill(playerSkillChoice);
         
         
         } else {
@@ -218,7 +218,7 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
             } 
         }
 
-        // 贪心敌人（2）选择行动
+        // 喝药贪心敌人（3）选择行动
         // 选择交换
         int enemyChangeChoice = enemySlimeChoice;
         isEnemyChange = false;
@@ -241,12 +241,12 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
         }
         
         // 选择技能
-        SkillEnum enemySkill = TACKLE;
+        Skill *p_enemySkill = nullptr;
         if (!isEnemyChange) {
             if (isTypeAdvantage(p_enemySlime->getType(), p_playerSlime->getType())) {
-                enemySkill = p_enemySlime->getSkill(2);
+                p_enemySkill = p_enemySlime->getSkill(2);
             } else {
-                enemySkill = p_enemySlime->getSkill(1);
+                p_enemySkill = p_enemySlime->getSkill(1);
             }
         }
 
@@ -310,7 +310,7 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
                 // 玩家选择攻击
                 enemyActiceChange(enemyTeam, enemySlimeChoice, p_playerSlime, &p_enemySlime);
                 printSend(p_enemySlime);
-                p_playerSlime->attack(playerSkill, p_enemySlime);
+                p_playerSlime->attack(p_playerSkill, p_enemySlime);
                 enemyPassiveChange(enemyTeam, enemySlimeChoice, p_playerSlime, &p_enemySlime);
             }
         } else {
@@ -321,24 +321,24 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
                 p_playerSlime = &playerTeam[playerSlimeChoice - 1];
                 printSend(p_playerSlime);
                 
-                p_enemySlime->attack(enemySkill, p_playerSlime);
+                p_enemySlime->attack(p_enemySkill, p_playerSlime);
                 playerPassiveChange(playerTeam, playerSlimeChoice, &p_playerSlime);
             } else {
                 // 玩家选择攻击
                 if (p_playerSlime->getSPD() > p_enemySlime->getSPD()){
-                    p_playerSlime->attack(playerSkill, p_enemySlime);
+                    p_playerSlime->attack(p_playerSkill, p_enemySlime);
                     if (p_enemySlime->getHP() <= 0) {
                         enemyPassiveChange(enemyTeam, enemySlimeChoice, p_playerSlime, &p_enemySlime);
                     } else {
-                        p_enemySlime->attack(enemySkill, p_playerSlime);
+                        p_enemySlime->attack(p_enemySkill, p_playerSlime);
                         playerPassiveChange(playerTeam, playerSlimeChoice, &p_playerSlime);
                     }
                 } else {
-                    p_enemySlime->attack(enemySkill, p_playerSlime);
+                    p_enemySlime->attack(p_enemySkill, p_playerSlime);
                     if (p_playerSlime->getHP() <= 0) {
                         playerPassiveChange(playerTeam, playerSlimeChoice, &p_playerSlime);    
                     } else {
-                        p_playerSlime->attack(playerSkill, p_enemySlime);
+                        p_playerSlime->attack(p_playerSkill, p_enemySlime);
                         enemyPassiveChange(enemyTeam, enemySlimeChoice, p_playerSlime, &p_enemySlime);
                     }
                 }

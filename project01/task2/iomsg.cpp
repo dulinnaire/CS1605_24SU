@@ -1,7 +1,6 @@
 #include <iostream>
 #include "iomsg.h"
 
-using namespace std;
 
 void printWelcome() {
     cout << "Welcome to Battle of Slimes!" << endl;
@@ -51,6 +50,14 @@ void printAttack(Slime *p_slime, string skillName, int damage) {
     }
 }
 
+void printAtkPotion(Slime *p_slime) {
+    cout << "Enemy uses Attack Potion on " << p_slime->getName() << endl;
+}
+
+void printRevivalPotion(Slime *p_slime) {
+    cout << "Enemy uses Revival Potion on " << p_slime->getName() << endl;
+}
+
 int inputHelper(std::string prompt, int choice1) {
     int input = -1;
     while (input != choice1) {
@@ -91,8 +98,8 @@ int selectActionFrom2() {
 }
 
 int selectSkill(Slime *p_slime) {
-    string prompt = "Select the skill (1 for " + getSkillName(p_slime->getSkill(1))
-        + ", 2 for " + getSkillName(p_slime->getSkill(2)) + "): ";
+    string prompt = "Select the skill (1 for " + (p_slime->getSkill(1))->getName()
+        + ", 2 for " + (p_slime->getSkill(2))->getName() + "): ";
     return inputHelper(prompt, 1, 2);
 }
 

@@ -3,16 +3,35 @@
 
 #include <string>
 
-enum TypeEnum {GRASS, WATER, FIRE};
-enum SkillEnum {TACKLE, LEAF, FLAME, STREAM};
+enum TypeEnum {NORMAL, GRASS, WATER, FIRE};
+
+class Skill {
+public:
+    // Constructor
+    Skill(std::string name, TypeEnum type, int power);
+    
+    int getPower() const ;
+
+    TypeEnum getType() const;
+
+    std::string getName() const;
+private:
+    // 名称
+    std::string name;
+
+    // 属性
+    TypeEnum type;
+
+    // 威力
+    int power;
+};
+
 
 class Slime {
 public:
+    // Constructor
     Slime(std::string name, int HP, int ATK, int DEF, int SPD, bool sd,
-        TypeEnum type, SkillEnum skill1, SkillEnum skill2)
-        : name(name), HP(HP), ATK(ATK), DEF(DEF), SPD(SPD), side(sd),
-            type(type), skill1(skill1), skill2(skill2)
-    {}
+        TypeEnum type, Skill *p_skill1, Skill *p_skill2);
 
     std::string getName() const;
     int getHP() const;
@@ -22,19 +41,18 @@ public:
     int getSPD() const;
     bool isEnemy() const;
     TypeEnum getType();
-    SkillEnum getSkill(int n);
+    Skill* getSkill(int n);
 
-    void attack(SkillEnum skill, Slime *rival);
+    void attack(Skill *p_skill, Slime *rival);
 
 private:
     std::string name;
     int HP, ATK, DEF, SPD;
     bool side;
     TypeEnum type;
-    SkillEnum skill1, skill2;
+    Skill *p_skill1, *p_skill2;
 };
 
-std::string getSkillName(SkillEnum skill);
 
 bool isTypeAdvantage(TypeEnum selfType, TypeEnum rivalType);
 

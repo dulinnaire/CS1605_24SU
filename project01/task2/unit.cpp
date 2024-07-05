@@ -1,7 +1,29 @@
 #include "unit.h"
 #include "iomsg.h"
 
+Skill::Skill(std::string name, TypeEnum type, int power) : 
+    name(name), type(type), power(power) {}
+
+std::string Skill::getName() const {
+    return name;
+}
+
+int Skill::getPower() const {
+    return power;
+}
+
+TypeEnum Skill::getType() const {
+    return type;
+}
+
 double typeBonus(TypeEnum type1, TypeEnum type2);
+
+Slime::Slime(std::string name, int HP, int ATK, int DEF, int SPD, bool sd,
+    TypeEnum type, Skill *p_skill1, Skill *p_skill2)
+    : name(name), HP(HP), ATK(ATK), DEF(DEF), SPD(SPD), side(sd),
+        type(type), p_skill1(p_skill1), p_skill2(p_skill2)
+{}
+
 std::string Slime::getName() const {return name;}
 
 int Slime::getHP() const {return HP;}
@@ -18,15 +40,15 @@ bool Slime::isEnemy() const {return side;}
 
 TypeEnum Slime::getType() {return type;}
 
-SkillEnum Slime::getSkill(int n) {
+Skill* Slime::getSkill(int n) {
     if (n == 1) {
-        return skill1;
+        return p_skill1;
     }
     else if (n == 2) {
-        return skill2;
+        return p_skill2;
     }
     else {
-        return TACKLE;
+        return nullptr;
     }
 }
 
@@ -39,32 +61,17 @@ int max(int a, int b) {
     }
 }
 
-void Slime::attack(SkillEnum skill, Slime *rival) {
+void Slime::attack(Skill *p_skill, Slime *rival) {
     double damage = 0;
-    if (skill == TACKLE) {
-        damage = 20 * ATK / rival->getDEF() * 1;
+    if (p_skill->getName() == "Tackle") {
+        damage = p_skill->getPower() * ATK / rival->getDEF() * 1;
     } else {
-        damage = 20 * ATK / rival->getDEF() * typeBonus(type, rival->getType());
+        damage = p_skill->getPower() * ATK / rival->getDEF() * typeBonus(type, rival->getType());
     }
     rival->setHP(max(rival->getHP() - damage, 0));
-    printAttack(this, getSkillName(skill), damage);
+    printAttack(this, p_skill->getName(), damage);
 }
 
-std::string getSkillName(SkillEnum skill) {
-    switch (skill)
-    {
-    case 0:
-        return "Tackle";
-    case 1:
-        return "Leaf";
-    case 2:
-        return "Flame";
-    case 3:
-        return "Stream";
-    default:
-        return "None";
-    }
-}
 
 bool isTypeAdvantage(TypeEnum selfType, TypeEnum rivalType) {
     return (selfType == GRASS && rivalType == WATER) ||
