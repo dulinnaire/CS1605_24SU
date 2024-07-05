@@ -218,7 +218,7 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
             } 
         }
 
-        // 简单敌人（2）选择行动
+        // 贪心敌人（2）选择行动
         // 选择交换
         int enemyChangeChoice = enemySlimeChoice;
         isEnemyChange = false;
