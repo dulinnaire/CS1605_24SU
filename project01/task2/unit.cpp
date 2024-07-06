@@ -61,17 +61,6 @@ int max(int a, int b) {
     }
 }
 
-void Slime::attack(Skill *p_skill, Slime *rival) {
-    double damage = 0;
-    if (p_skill->getName() == "Tackle") {
-        damage = p_skill->getPower() * ATK / rival->getDEF() * 1;
-    } else {
-        damage = p_skill->getPower() * ATK / rival->getDEF() * typeBonus(type, rival->getType());
-    }
-    rival->setHP(max(rival->getHP() - damage, 0));
-    printAttack(this, p_skill->getName(), damage);
-}
-
 
 bool isTypeAdvantage(TypeEnum selfType, TypeEnum rivalType) {
     return (selfType == GRASS && rivalType == WATER) ||

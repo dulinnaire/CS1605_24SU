@@ -43,8 +43,6 @@ public:
     TypeEnum getType();
     Skill* getSkill(int n);
 
-    void attack(Skill *p_skill, Slime *rival);
-
 private:
     std::string name;
     int HP, ATK, DEF, SPD;
