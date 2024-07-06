@@ -12,9 +12,7 @@ void pringStart(Slime *p_playerSlime, Slime *p_enemySlime);
 
 void printHP(Slime *p_playerSlime, Slime *p_enemySlime);
 
-void printPlayerBeaten(Slime *p_slime);
-
-void printEnemyBeaten(Slime *p_slime);
+void printBeaten(Slime *p_slime);
 
 void printRound(int n);
 

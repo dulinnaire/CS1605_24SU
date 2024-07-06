@@ -29,17 +29,17 @@ void printSend(Slime *p_slime) {
     if (p_slime->isEnemy()){
         cout << "Enemy sends " << p_slime->getName() << endl;
     } else {
-        cout << "You send " << p_slime->getName() << endl;
+        cout << "You send " << p_slime->getName() << endl;    
     }
 }
 
 
-void printPlayerBeaten(Slime *p_slime) {
-    cout << "Your " << p_slime->getName() << " is beaten" << endl;
-}
-
-void printEnemyBeaten(Slime *p_slime) {
-    cout << "Enemy's " << p_slime->getName() << " is beaten" << endl;
+void printBeaten(Slime *p_slime) {
+    if (p_slime->isEnemy()) {
+        cout << "Enemy's " << p_slime->getName() << " is beaten" << endl;
+    } else {
+        cout << "Your " << p_slime->getName() << " is beaten" << endl;
+    }
 }
 
 void printAttack(Slime *p_slime, string skillName, int damage) {

@@ -3,6 +3,7 @@
 
 #include "unit.h"
 #include "iomsg.h"
+#include "action.h"
 
 void play(Slime *playerTeam, Slime *enemyTeam);
 

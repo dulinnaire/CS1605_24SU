@@ -56,4 +56,8 @@ private:
 
 bool isTypeAdvantage(TypeEnum selfType, TypeEnum rivalType);
 
+double typeBonus(TypeEnum attackType, TypeEnum slimeType);
+
+int max(int a, int b);
+
 #endif

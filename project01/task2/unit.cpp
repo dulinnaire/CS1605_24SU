@@ -19,8 +19,8 @@ TypeEnum Skill::getType() const {
 double typeBonus(TypeEnum type1, TypeEnum type2);
 
 Slime::Slime(std::string name, int HP, int ATK, int DEF, int SPD, bool sd,
-    TypeEnum type, Skill *p_skill1, Skill *p_skill2)
-    : name(name), HP(HP), ATK(ATK), DEF(DEF), SPD(SPD), side(sd),
+    TypeEnum type, Skill *p_skill1, Skill *p_skill2) :
+        name(name), HP(HP), ATK(ATK), DEF(DEF), SPD(SPD), side(sd),
         type(type), p_skill1(p_skill1), p_skill2(p_skill2)
 {}
 
@@ -80,7 +80,7 @@ bool isTypeAdvantage(TypeEnum selfType, TypeEnum rivalType) {
 }
 
 
-double typeBonus(TypeEnum attackType, TypeEnum slimeType){
+double typeBonus(TypeEnum attackType, TypeEnum slimeType) {
     if (isTypeAdvantage(attackType, slimeType)) {
         return 2.0;
     } else {
