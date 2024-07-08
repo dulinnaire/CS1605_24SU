@@ -1,9 +1,9 @@
-#include <iostream>
 #include "engine.h"
 
 using namespace std;
 
 
+// 敌人主动交换史莱姆
 void enemyActiceChange(Slime *enemyTeam, int &enemySlimeChoice, Slime *p_rival, Slime *p_self) {
     // 没有可交换的史莱姆
     if (slimeAlive(enemyTeam) <= 1) {
@@ -44,7 +44,7 @@ void enemyActiceChange(Slime *enemyTeam, int &enemySlimeChoice, Slime *p_rival, 
 
 void play(Slime *playerTeam, Slime *enemyTeam) {
 // 战斗开始前
-    // 初始信息
+    // 输出初始信息
     printWelcome();
     
     // 玩家选择Slime
@@ -63,6 +63,7 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
     // 在场敌人使用过强攻药
     bool enemyUsedATKPotion = false;
     bool gameOver = false;
+    // 敌人药水数量
     int revivalPotionCount = 1, attackPotionCount = 2;
 
     while (!gameOver) {
@@ -70,40 +71,22 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
         printHP(p_playerSlime, p_enemySlime);
         printRound(roundCount);
 
-        /*
-        // 输出player和emeny队伍中存活的slime名称
-        cout << "Player's team alive:" << endl;
-        for (int i = 0; i < 3; i++) {
-            if (playerTeam[i].getHP() > 0) {
-                cout << playerTeam[i].getName() << " ";
-            }
-        }
-        cout << endl;
-
-        cout << "Enemy's team alive:" << endl;
-        for (int i = 0; i < 3; i++) {
-            if (enemyTeam[i].getHP() > 0) {
-                cout << enemyTeam[i].getName() << " ";
-            }
-        }
-        cout << endl;
-        */
-
         // 选择行动
         Action *p_playerAction = nullptr, *p_enemyAction = nullptr;
-
+        
+        // 当前史莱姆（备份）
         Slime *p_playerSlimeCurr = p_playerSlime, *p_enemySlimeCurr = p_enemySlime;
 
         // 玩家选择行动
         int playerActionChoice = -1;
     
+        // 根据剩余史莱姆数量选择行动
         if (slimeAlive(playerTeam) == 1) {
             playerActionChoice = selectActionFrom1();
         } else {
             playerActionChoice = selectActionFrom2();
         }
 
-        int playerChangeChoice = playerSlimeChoice;
         // 选择技能
         Skill *p_playerSkill = nullptr;
         if (playerActionChoice == 1) {
@@ -113,18 +96,17 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
                 playerTeam, enemyTeam, playerSlimeChoice, enemySlimeChoice, playerUsedATKPotion, enemyUsedATKPotion);
             
         } else {
-            // 选择交换
+        // 选择交换
             if (slimeAlive(playerTeam) == 2){
                 // 只有一个能交换
                 int tempAlive = findAlive(playerTeam, playerSlimeChoice);
-                playerChangeChoice = selectSlimeFrom1(playerTeam, tempAlive);
+                playerSlimeChoice = selectSlimeFrom1(playerTeam, tempAlive);
             } else {
                 // 两个能交换
                 int Slime1, Slime2;
                 getSlimeRemain(Slime1, Slime2, playerSlimeChoice);
-                playerChangeChoice = selectSlimeFrom2(playerTeam, Slime1, Slime2);
+                playerSlimeChoice = selectSlimeFrom2(playerTeam, Slime1, Slime2);
             } 
-            playerSlimeChoice = playerChangeChoice;
             p_playerAction = new Change(playerSlimeChoice, playerTeam, enemyTeam,
                 &p_playerSlime, p_enemySlimeCurr);
         }
@@ -152,13 +134,13 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
             p_enemyAction = new Potion("Attack", enemyUsedATKPotion, enemyTeam, p_enemySlime);
         }
 
-        // 选择交换
+        // 敌人选择交换
         int enemyChangeChoice = enemySlimeChoice;
         isEnemyChange = false;
 
         // 场下有史莱姆存活
         if (slimeAlive(enemyTeam) > 1) {
-            // 被玩家克制
+            // 场上史莱姆被玩家克制
             if (isTypeAdvantage(p_playerSlime->getType(), p_enemySlime->getType())) {
                 isEnemyChange = true;
             }
@@ -184,7 +166,7 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
                 &p_enemySlime, p_playerSlimeCurr);
         }
 
-        // 选择技能
+        // 敌人选择技能
         Skill *p_enemySkill = nullptr;
         if (!isEnemyChange && !enemyUseRevivalPotion && !enemyUseAttackPotion) {
             if (isTypeAdvantage(p_enemySlime->getType(), p_playerSlime->getType())) {
@@ -197,12 +179,14 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
         }
 
 
-        // 实施行动
+        // 实施当前回合行动
         roundAct(p_playerAction, p_enemyAction, p_playerSlime, p_enemySlime);
         
         delete p_playerAction, p_enemyAction;
 
+        // 有一方全部被击倒或超过100回合
         if (slimeAlive(playerTeam) == 0 || slimeAlive(enemyTeam) == 0 || roundCount >= 100) {
+            // 游戏结束
             gameOver = true;
         }
         // 回合结束
@@ -211,8 +195,8 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
     }
 
     // 战斗结束
-
     if (roundCount >= 100) {
+        // 平局时输出一次血量信息
         printHP(p_playerSlime, p_enemySlime);
     }
     printEndGame(slimeAlive(playerTeam), roundCount);

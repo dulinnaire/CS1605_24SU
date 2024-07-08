@@ -3,6 +3,7 @@
 
 #include <string>
 
+// 四种属性
 enum TypeEnum {NORMAL, GRASS, WATER, FIRE};
 
 class Skill {
@@ -52,9 +53,10 @@ private:
     Skill *p_skill1, *p_skill2;
 };
 
-
+// 判断self是否克制rival
 bool isTypeAdvantage(TypeEnum selfType, TypeEnum rivalType);
 
+// 存在属性克制时，获取属性倍率
 double typeBonus(TypeEnum attackType, TypeEnum slimeType);
 
 int max(int a, int b);

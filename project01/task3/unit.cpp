@@ -1,5 +1,4 @@
 #include "unit.h"
-#include "iomsg.h"
 
 Skill::Skill(std::string name, TypeEnum type, int power) : 
     name(name), type(type), power(power) {}
@@ -43,14 +42,13 @@ bool Slime::isEnemy() const {return side;}
 TypeEnum Slime::getType() {return type;}
 
 Skill* Slime::getSkill(int n) {
-    if (n == 1) {
-        return p_skill1;
-    }
-    else if (n == 2) {
-        return p_skill2;
-    }
-    else {
-        return nullptr;
+    switch (n) {
+        case 1:
+            return p_skill1;
+        case 2:
+            return p_skill2;
+        default:
+            return nullptr;
     }
 }
 

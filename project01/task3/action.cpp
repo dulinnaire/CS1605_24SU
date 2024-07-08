@@ -50,9 +50,11 @@ void getSlimeRemain(int &S1, int &S2, int curr) {
     }
 }
 
+// 玩家被动交换史莱姆
 void playerPassiveChange(Slime *playerTeam, int& playerSlimeChoice, Slime **pp_playerSlime) {
     printBeaten(*pp_playerSlime);
     int alive = 0;
+    // 根据剩余史莱姆数量选择
     switch (slimeAlive(playerTeam))
     {
     case 1:
@@ -76,6 +78,7 @@ void playerPassiveChange(Slime *playerTeam, int& playerSlimeChoice, Slime **pp_p
 void enemyPassiveChange(Slime *enemyTeam, int &enemySlimeChoice, Slime *p_playerSlime, Slime **pp_enemySlime) {
     printBeaten(*pp_enemySlime);
     int choice = 0, alive = 0;
+    // 根据剩余史莱姆数量选择
     switch (slimeAlive(enemyTeam))
     {
     case 1:
@@ -83,6 +86,7 @@ void enemyPassiveChange(Slime *enemyTeam, int &enemySlimeChoice, Slime *p_player
         choice = alive;
         break;
     case 2:
+        // 优先选择克制玩家的史莱姆，其次选择不被玩家克制的史莱姆
         int Slime1, Slime2;
         getSlimeRemain(Slime1, Slime2, enemySlimeChoice);
         if (isTypeAdvantage(enemyTeam[Slime1 - 1].getType(), p_playerSlime->getType())) {
@@ -110,6 +114,7 @@ Attack::Attack(Skill *p_skill, Slime **pp_self, Slime **pp_rival,
     Slime *playerTeam, Slime *enemyTeam,
     int &playerSlimeChoice, int &enemySlimeChoice,
     bool &playerUsedATKPotion, bool &enemyUsedATKPotion) :
+
     p_skill(p_skill),
     pp_self(pp_self),
     pp_rival(pp_rival),
@@ -129,6 +134,7 @@ std::string Attack::getName() {
     return "Attack";
 }
 
+// 四舍五入
 int roundToInt(double num) {
     int intPart = num;
     if (num - intPart >= 0.5) {
@@ -169,11 +175,11 @@ void Attack::act() {
     // 判断敌方是否被击倒并需要被动交换，被动交换上场的史莱姆不能攻击
     if ((*pp_rival)->getHP() == 0) {
         if ((*pp_rival)->isEnemy()) {
-            // 敌方被击倒
+            // 敌方被击倒，强攻药失效
             enemyUsedATKPotion = false;
             enemyPassiveChange(enemyTeam, enemySlimeChoice, *pp_self, pp_rival);
         } else {
-            // 玩家被击倒
+            // 玩家被击倒，强攻药失效
             playerUsedATKPotion = false;
             playerPassiveChange(playerTeam, playerSlimeChoice, pp_rival);
         }
@@ -181,6 +187,7 @@ void Attack::act() {
 }
 
 Change::Change(int choice, Slime *selfTeam, Slime *rivalTeam, Slime **pp_self, Slime *p_rivalCurrent) :
+    
     choice(choice),
     selfTeam(selfTeam),
     rivalTeam(rivalTeam),
@@ -203,6 +210,7 @@ void Change::act() {
 
 
 Potion::Potion(std::string potionType, bool &usedATKPotion, Slime *enemyTeam, Slime *p_enemySlime) :
+    
     potionType(potionType),
     usedATKPotion(usedATKPotion),
     enemyTeam(enemyTeam),
@@ -219,9 +227,11 @@ std::string Potion::getName() {
 
 void Potion::act() {
     if (potionType == "Attack") {
+        // 强攻药
         usedATKPotion = true;
         printAtkPotion(p_enemySlime);
     } else if (potionType == "Revival") {
+        // 复苏药
         Slime *p_deadSlime = &(enemyTeam[findDead(enemyTeam) - 1]);
         p_deadSlime->setHP(p_deadSlime->getMaxHP() * 0.5);
         printRevivalPotion(p_deadSlime);
@@ -254,10 +264,9 @@ void roundAct(Action *p_playerAction, Action *p_enemyAction,
                 p_playerAction->act();
             }
         } else {
-            // 同时交换
+            // SPD相同
             p_playerAction->act();
             p_enemyAction->act();
         }
-
     }
 }

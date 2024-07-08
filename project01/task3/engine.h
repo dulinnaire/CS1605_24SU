@@ -5,6 +5,7 @@
 #include "iomsg.h"
 #include "action.h"
 
+// 运行游戏函数
 void play(Slime *playerTeam, Slime *enemyTeam);
 
 #endif

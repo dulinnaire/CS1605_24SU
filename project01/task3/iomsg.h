@@ -6,6 +6,7 @@
 
 using namespace std;
 
+// 输出信息函数
 void printWelcome();
 
 void pringStart(Slime *p_playerSlime, Slime *p_enemySlime);
@@ -26,12 +27,14 @@ void printRevivalPotion(Slime *p_slime);
 
 void printEndGame(int playerSlimeAlive, int roundCount);
 
+// 输入信息辅助函数
 int inputHelper(string prompt, int choice1);
 
 int inputHelper(string prompt, int choice1, int choice2);
 
 int inputHelper(string prompt, int choice1, int choice2, int choice3);
 
+// 输入信息函数
 int firstSlimeChoice();
 
 int selectActionFrom1();
@@ -43,8 +46,6 @@ int selectSkill(Slime *p_slime);
 int selectSlimeFrom1(Slime *team, int n);
 
 int selectSlimeFrom2(Slime *team, int a, int b);
-
-
 
 
 #endif
