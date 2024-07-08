@@ -170,7 +170,7 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
         
         delete p_playerAction, p_enemyAction;
 
-        if (slimeAlive(playerTeam) == 0 || slimeAlive(enemyTeam) == 0 || roundCount > 100) {
+        if (slimeAlive(playerTeam) == 0 || slimeAlive(enemyTeam) == 0 || roundCount >= 100) {
             gameOver = true;
         }
         // 回合结束
@@ -179,7 +179,8 @@ void play(Slime *playerTeam, Slime *enemyTeam) {
     }
 
     // 战斗结束
-    if (roundCount > 100) {
+    if (roundCount >= 100) {
+        printHP(p_playerSlime, p_enemySlime);
         cout << "Draw" << endl;
     } else if (slimeAlive(playerTeam) > 0) {
         cout << "You Win" << endl;
