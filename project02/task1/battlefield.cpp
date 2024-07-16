@@ -220,7 +220,8 @@ void PerformActionHelper_(ActionInfo &actionInfo) {
 void BattleField::PerformActionPhase_(std::vector<ActionInfo> &actions) {
     // TODO: 执行Actor选取的动作
     if (actions[0].priority > actions[1].priority
-        || (actions[0].priority == actions[1].priority
+        || (actions[0].action == 1 && actions[1].action == 1
+            && actions[0].priority == actions[1].priority
             && actions[0].actor->petOnCourt.speed > actions[1].actor->petOnCourt.speed)) {
         // 玩家先手 or 玩家和敌人同时行动，若同时使用skill，速度快的史莱姆先执行
         PerformActionHelper_(actions[0]);
